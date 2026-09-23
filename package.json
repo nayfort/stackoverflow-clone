@@ -6,12 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint --max-warnings=0",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "autoprefixer": "^10.4.27",
-    "next": "16.2.1",
-    "postcss": "^8.5.8",
+    "next": "16.3.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -21,8 +20,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "16.3.6",
+    "postcss": "^8.5.28",
     "tailwindcss": "^4.2.2",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }
