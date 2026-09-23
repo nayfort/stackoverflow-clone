@@ -83,4 +83,4 @@ Tailwind CSS 4 uses the CSS entry point and automatic source detection; there is
 
 Commit `package.json` and `package-lock.json` together when dependencies change. Generated builds, installed dependencies, logs, local environment files, editor files, and private keys are ignored. Sanitized `.env.example` and `.env.*.example` files may be committed if configuration is added later; never put secrets in them.
 
-Exact dependency versions are recorded in `package-lock.json`. Project-specific coding guidance is in `AGENTS.md`.
+Exact dependency versions are recorded in `package-lock.json`.
