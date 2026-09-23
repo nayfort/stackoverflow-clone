@@ -2,30 +2,26 @@
 
 :root {
   color-scheme: light;
-  --page: #f8fafc;
-  --surface: #ffffff;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
+  --page: #f6f7f9;
+  --surface: #fff;
+  --foreground: #1c2533;
+  --muted: #687585;
+  --line: #e3e7ed;
   --subtle: #f1f5f9;
-  --accent: #2563eb;
-  --accent-soft: #eff6ff;
-  --badge: #ffedd5;
-  --badge-text: #9a3412;
+  --accent: #345ede;
+  --accent-soft: #eef2ff;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --page: #0b1120;
-  --surface: #131d2e;
-  --foreground: #e8eef7;
-  --muted: #a3b3c9;
-  --line: #2b3b52;
-  --subtle: #1d2b40;
-  --accent: #8bb6ff;
-  --accent-soft: #1b3152;
-  --badge: #422c1b;
-  --badge-text: #fdba74;
+  --page: #0e131c;
+  --surface: #161e2b;
+  --foreground: #e8edf5;
+  --muted: #9ba9bf;
+  --line: #293447;
+  --subtle: #202b3c;
+  --accent: #9bb5ff;
+  --accent-soft: #253553;
 }
 
 @theme inline {
@@ -37,8 +33,6 @@
   --color-subtle: var(--subtle);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
-  --color-badge: var(--badge);
-  --color-badge-text: var(--badge-text);
 }
 
 body {
@@ -182,25 +176,6 @@ select {
 }
 
 /* Shared application layout and components. */
-:root {
-  --page: #f6f7f9;
-  --surface: #fff;
-  --foreground: #1c2533;
-  --muted: #687585;
-  --line: #e3e7ed;
-  --accent: #345ede;
-  --accent-soft: #eef2ff;
-}
-:root[data-theme='dark'] {
-  --page: #0e131c;
-  --surface: #161e2b;
-  --foreground: #e8edf5;
-  --muted: #9ba9bf;
-  --line: #293447;
-  --subtle: #202b3c;
-  --accent: #9bb5ff;
-  --accent-soft: #253553;
-}
 body {
   margin: 0;
   font-size: 14px;
