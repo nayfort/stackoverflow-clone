@@ -7,25 +7,32 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings=0",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "format": "prettier --write src tests *.json *.ts *.mjs README.md",
+    "format:check": "prettier --check src tests *.json *.ts *.mjs README.md"
   },
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "next": "16.3.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
-    "@types/node": "^20",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "postcss": "^8.5.28",
+    "prettier": "^3.9.8",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22.0.0"
   }
 }

@@ -1,19 +1,11 @@
-import { mockQuestions } from '@/lib/db';
+import { getStore } from '@/lib/db';
+import { getViewer } from '@/lib/session';
 import { notFound } from 'next/navigation';
 import QuestionDetails from '@/components/question-details';
-
-type Props = {
-    params: Promise<{ id: string }>;
-};
-
-export default async function QuestionPage({ params }: Props) {
-    const { id } = await params;
-
-    const question = mockQuestions.find((q) => q.id === id);
-
-    if (!question) {
-        notFound();
-    }
-
-    return <QuestionDetails question={question} />;
+export default async function QuestionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const viewer = await getViewer();
+  const question = getStore().detail(id, viewer);
+  if (!question) notFound();
+  return <QuestionDetails question={question} signedIn={!!viewer} />;
 }

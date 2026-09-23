@@ -1,54 +1,63 @@
 # Stack Overflow Clone
 
-A small Stack Overflow-inspired demo built with Next.js App Router, React, TypeScript, and Tailwind CSS. It displays sample questions and individual question pages.
+A bilingual developer Q&A application built with Next.js App Router, React, TypeScript, and SQLite. It supports real accounts, persistent questions and answers, voting, and accepted answers. The interface includes light/dark themes and English/Ukrainian localization.
 
-## Current functionality
+This is an independent learning project, not affiliated with Stack Overflow.
 
-- Browse three sample questions with author names and vote counts.
-- Switch between English and Ukrainian through a custom language menu, including sample question titles and the not-found page. The menu supports arrow keys, Home/End, Escape, and dismissal on outside click.
-- Toggle light and dark themes with a single sun/moon button; language and theme choices persist for one year in browser cookies.
-- Open a question at `/question/[id]` and return to the list.
-- Show a localized not-found page for an unknown question ID.
-- Display a loading skeleton while a route is loading.
-- Submit a demo question form through a Server Action.
+## Features
 
-**This is a UI prototype, not a complete Q&A service.** Questions come from the static `mockQuestions` array in `src/lib/db.ts`; there is no database or persistence. The form validates that the title is not blank and redirects to `/` without saving it. Question bodies are placeholder text, vote counts are static, and the vote and Report buttons do not perform any action. Authentication, user-specific lists, answers, and moderation are not implemented.
+- Register with a username, email, and password; log in and log out.
+- View public profiles with recent questions, answer counts, and net votes received. Email addresses remain private.
+- Publish questions with a title, plain-text description, and up to five tags.
+- Answer questions; edit and delete your own posts. Deleting a question also deletes its answers and votes after confirmation.
+- Upvote/downvote other users' posts. Clicking the same vote again removes it. Each account has one vote per post; self-voting is blocked.
+- Question authors can accept one answer and change or undo their selection.
+- Search question titles, descriptions, and tags; filter by tag or your own questions; sort by newest or votes; view unanswered questions. Results are paginated (12 per page).
+- Language menu with keyboard navigation, theme toggle, responsive layouts, loading, empty, error, and not-found states.
+
+UI text is translated; user-written questions and answers remain in the language in which they were posted. The database starts empty. No fake questions, accounts, or vote counts are inserted automatically.
 
 ## Requirements
 
-- Node.js 20.9 or later.
-- npm (the repository uses `package-lock.json`).
-- Internet access during the first development compilation and production builds to download the Geist font through `next/font/google`.
+- Node.js 22 or newer and npm.
+- A writable, persistent local disk for SQLite.
+- Internet access to install dependencies and download Geist during the initial Next.js font compilation.
 
-No environment variables or external services are required for the demo.
-
-The default language is English and the default theme is light. The `locale` (`en` / `uk`) and `theme` (`light` / `dark`) cookies store preferences. The server reads them before rendering, so reloads use the saved appearance and language without a client-side flash. Invalid values fall back to the defaults. Pages are rendered dynamically because the root layout reads cookies.
-
-## Local development
+## Development
 
 ```bash
 npm ci
+# Optional: copy .env.example to .env.local to override the defaults.
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Changes to source files appear automatically during development.
+Open [http://localhost:3000](http://localhost:3000). Create an account using the interface, then select **Ask a question**. Use another account to answer or vote. You can log out and back in, or use a separate browser profile to test multiple users.
 
-To use a different port:
+The database is created automatically at `data/community.sqlite`. Questions, answers, accounts, votes, and sessions persist after restarting the server. The database and its WAL files are excluded from Git. Never commit or publicly serve the `data` directory.
 
-```bash
-npm run dev -- --port 3001
-```
+## Configuration
+
+| Variable        | Default                 | Purpose                                                                                                     |
+| --------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `DATABASE_PATH` | `data/community.sqlite` | SQLite database path (relative to the project root or absolute).                                            |
+| `COOKIE_SECURE` | Enabled in production   | Production sessions use HTTPS-only cookies unless explicitly set to `false`. Development uses HTTP cookies. |
+
+Theme and language preferences are stored for one year. Authentication uses a separate HTTP-only, SameSite=Lax cookie with a 30-day server-side expiration. Logging out revokes that session. Existing sessions are rotated on successful login.
 
 ## Checks
 
 ```bash
 npm run lint
 npm run typecheck
+npm test
+npm run format:check
 npm run build
 npm audit
 ```
 
-Linting and type checking are separate commands. The production build also checks TypeScript. There is currently no automated test suite; manually check the question list, question details, an unknown question ID, and the demo form after changing those flows. Also check both themes and languages, navigation, and preference persistence after a reload.
+`npm test` uses isolated databases and covers persistence, ownership, authentication/session expiration, password verification, voting, accepted answers, cascading deletion, input validation, search, pagination, and rate limits. It does not read or alter the application database.
+
+For interface changes, also check registration/login/logout, question creation, answering with another account, voting, author-only editing/deletion, accepted answers, search, both locales/themes, and mobile layouts. `npm run format` formats source, tests, configuration, and documentation.
 
 ## Production
 
@@ -58,29 +67,32 @@ npm run build
 npm start
 ```
 
-The production server defaults to port 3000. Stop the development server first or start production on another port with `npm start -- --port 3001`. A Node.js server is required for the Server Action; a static export is not configured.
+Use a Node.js server with a persistent volume and HTTPS, normally behind a reverse proxy. `npm start -- --port 3001` selects another port. For local production testing over HTTP only, run `COOKIE_SECURE=false npm start -- --port 3001`.
 
-## Project structure
+This version targets a single application instance with a local SQLite database, not stateless serverless hosting or multiple replicas. Do not place the database on a shared network filesystem. Back up the database with SQLite's backup API, or stop the server before copying the database and associated WAL files. Copying only the main SQLite file while the app is running can omit recent writes.
+
+## Authentication and access control
+
+Passwords are salted and hashed using Node.js scrypt. Only hashes of random session tokens are stored in SQLite. Protected Server Actions check the current database-backed session and post ownership on every mutation. SQL queries use bound parameters; user content is rendered as plain text, not raw HTML. Login and publishing/voting operations have basic database-backed rate limits. Next.js Server Actions provide their standard same-origin checks.
+
+This implements the core account and Q&A workflow, not every feature of the original Stack Overflow. Before opening it to the general public, connect email verification and password recovery, add moderation/abuse handling and monitoring, and configure infrastructure-level rate limits and backups. This version has no email service, OAuth, MFA, comments, notifications, badges, or reputation-based permissions. Its profile vote total is a simple net sum, not Stack Overflow's reputation formula.
+
+## Structure
 
 ```text
-public/icon.png                  Site icon
-src/app/layout.tsx               Shared navigation, metadata, and footer
-src/app/page.tsx                 Question list and demo form
-src/app/actions.ts               Demo question Server Action
-src/app/loading.tsx              Loading skeleton
-src/app/question/[id]/page.tsx    Question details and not-found handling
-src/app/globals.css              Tailwind CSS entry point
-src/lib/db.ts                    Static sample data (not a database)
-src/lib/i18n.ts                  English and Ukrainian translations
-src/components/                 Preferences, shared shell, question details
-src/app/not-found.tsx            Localized not-found page
-postcss.config.mjs               Tailwind CSS PostCSS plugin
+src/app/                     Routes and Server Actions
+src/components/              Forms, question feed, post controls, preferences, shared UI
+src/lib/store.ts             SQLite schema, queries, transactions, and ownership checks
+src/lib/db.ts                Server-only database connection
+src/lib/session.ts           Session cookies and server-side authentication
+src/lib/password.ts          Password hashing and verification
+src/lib/validation.ts        Question/answer validation
+src/lib/auth-validation.ts   Account input validation
+src/lib/filters.ts           Search/filter parsing and URL generation
+src/lib/types.ts             Shared domain types
+src/lib/i18n.ts              English/Ukrainian UI and error messages
+tests/store.test.ts          Isolated domain and persistence tests
+public/icon.png              Site icon
 ```
 
-Tailwind CSS 4 uses the CSS entry point and automatic source detection; there is no legacy JavaScript Tailwind configuration. See the [Tailwind CSS upgrade guide](https://tailwindcss.com/docs/upgrade-guide) for the PostCSS setup.
-
-## Repository hygiene
-
-Commit `package.json` and `package-lock.json` together when dependencies change. Generated builds, installed dependencies, logs, local environment files, editor files, and private keys are ignored. Sanitized `.env.example` and `.env.*.example` files may be committed if configuration is added later; never put secrets in them.
-
-Exact dependency versions are recorded in `package-lock.json`.
+Tailwind CSS 4 uses `src/app/globals.css` and `@tailwindcss/postcss`; no legacy Tailwind JavaScript configuration is needed. Commit `package.json` and `package-lock.json` together. `.gitignore` excludes dependencies, build output, local environment files, runtime data, and logs. Sanitized `.env.example` files can be committed.

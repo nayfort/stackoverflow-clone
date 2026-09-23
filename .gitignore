@@ -37,3 +37,9 @@ Thumbs.db
 # Local keys and certificates
 *.pem
 *.key
+
+# Local application data
+/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
